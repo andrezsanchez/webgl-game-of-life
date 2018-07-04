@@ -13,7 +13,6 @@ float cellState(vec2 coords) {
 
 float neighborState(vec2 relativeCoords) {
   return cellState((textureCoords * uScreenSize + relativeCoords) / uScreenSize);
-  //return cellState((textureCoords * screenSize + vec2(1.0)) / screenSize);
 }
 
 vec4 colorForState(float state) {

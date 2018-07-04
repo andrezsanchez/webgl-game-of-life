@@ -1,8 +1,8 @@
 #version 300 es
 precision highp float;
-in vec4 aPos;
-out vec4 result;
+in float aValue;
+out float result;
 
 void main(void) {
-   result = aPos.xyzw + vec4(1.0);
+   result = aValue + 1.0;
 }

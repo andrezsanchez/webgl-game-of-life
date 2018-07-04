@@ -7,7 +7,10 @@ import {
 
 import { checkGlError } from '../checkGlError';
 import { screenTriangles } from '../screenTriangles';
-import { getColorAttachment } from '../getColorAttachment';
+import {
+  getColorAttachment,
+  getTexture,
+} from '../getColorAttachment';
 
 import mainFragSource from './main.frag.glsl';
 import mainVertSource from './main.vert.glsl';
@@ -44,9 +47,6 @@ invariant(gl, 'Unable to create WebGL2 context');
 // Necessary for non-power of two textures.
 gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
 
-console.log(gl.getShaderPrecisionFormat(gl.VERTEX_SHADER, gl.HIGH_FLOAT));
-console.log(gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.HIGH_FLOAT));
-
 window.gl = gl;
 
 const vs = createVertexShader(gl, mainVertSource);
@@ -60,7 +60,6 @@ const uTexture = gl.getUniformLocation(program, 'uTexture');
 gl.useProgram(program);
 gl.uniform1i(uTexture, 0);
 
-//gl.useProgram(lifeProgram);
 const uScreenSize = gl.getUniformLocation(lifeProgram, 'uScreenSize');
 gl.useProgram(lifeProgram);
 gl.uniform2f(uScreenSize, width, height);
@@ -85,8 +84,6 @@ function makeTexture(data) {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-  //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
   gl.bindTexture(gl.TEXTURE_2D, null);
 
   return texture;
@@ -100,12 +97,7 @@ function makeFramebuffer(texture) {
   const fb = gl.createFramebuffer();
   gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
 
-  gl.framebufferTexture2D(gl.FRAMEBUFFER, getColorAttachment(gl, 0), gl.TEXTURE_2D, texture, 0);
-
-  //const renderbuffer = gl.createRenderbuffer();
-  //gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
-  //gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT32F, width, height);
-  //gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, getColorAttachment(0), gl.TEXTURE_2D, texture, 0);
 
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
@@ -151,9 +143,10 @@ let targetTextureIndex = 1;
     console.log(gl.getActiveAttrib(lifeProgram, i));
   }
 }
+
 function renderGeneration() {
   {
-    gl.activeTexture(gl.TEXTURE0);
+    gl.activeTexture(getTexture(0));
     gl.bindTexture(gl.TEXTURE_2D, texture[sourceTextureIndex]);
     gl.bindFramebuffer(gl.FRAMEBUFFER, fb[targetTextureIndex]);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
@@ -164,7 +157,7 @@ function renderGeneration() {
   }
 
   {
-    gl.activeTexture(gl.TEXTURE0);
+    gl.activeTexture(getTexture(0));
     gl.bindTexture(gl.TEXTURE_2D, texture[targetTextureIndex]);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.clearColor(0, 0, 0, 1);
@@ -177,8 +170,22 @@ function renderGeneration() {
   targetTextureIndex = 1 - targetTextureIndex;
 }
 
+let running = true;
 function generation() {
-  setTimeout(generation, 20);
-  renderGeneration();
+  requestAnimationFrame(generation);
+  if (running) {
+    renderGeneration();
+  }
 }
 generation();
+
+window.addEventListener('keydown', (event) => {
+  switch (event.key) {
+    case ' ':
+      running = !running;
+    break;
+    case 'ArrowRight':
+      renderGeneration();
+    break;
+  }
+});

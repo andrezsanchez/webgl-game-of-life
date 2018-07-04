@@ -4,7 +4,7 @@ export function createShader(gl, type, source) {
   gl.compileShader(shader);
 
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    throw new Error('An error occurred compiling the shader: ' + gl.getShaderInfoLog(shader));
+    throw new Error(`An error occurred compiling the shader: ${gl.getShaderInfoLog(shader)}`);
   }
 
   return shader;
@@ -40,7 +40,7 @@ export function createProgram(gl, vs, fs) {
 export function validateProgram(gl, program) {
   gl.validateProgram(program);
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    var info = gl.getProgramInfoLog(program);
-    throw new Error('Could not compile WebGL program. \n\n' + info);
+    const info = gl.getProgramInfoLog(program);
+    throw new Error(`Could not compile WebGL program. \n\n${info}`);
   }
 }
