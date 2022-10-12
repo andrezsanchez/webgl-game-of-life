@@ -3,14 +3,14 @@ import {
   createVertexShader,
   createFragmentShader,
   createProgram
-} from '../shader';
+} from './shader';
 
-import { checkGlError } from '../checkGlError';
-import { screenTriangles } from '../screenTriangles';
+import { checkGlError } from './checkGlError';
+import { screenTriangles } from './screenTriangles';
 import {
   getColorAttachment,
   getTexture,
-} from '../getColorAttachment';
+} from './getColorAttachment';
 
 import mainFragSource from './main.frag.glsl';
 import mainVertSource from './main.vert.glsl';

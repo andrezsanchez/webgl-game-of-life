@@ -19,9 +19,7 @@ const plugins = [
 ];
 
 export default {
-  //input: './index.js',
-  input: 'fb/index.js',
-  //input: 'game/index.js',
+  input: 'src/index.js',
   output: {
     file: 'build/build.js',
     format: 'cjs',
