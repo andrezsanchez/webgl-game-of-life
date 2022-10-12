@@ -28,14 +28,15 @@ const width = 100;
 const height = 100;
 gl.viewport(0, 0, width, height);
 
-const size = 10000000;
+const size = 10000;
 
 canvasElement.width = width;
 canvasElement.height = height;
 
 const array = new Float32Array(size);
 for (let i = 0; i < size; i++) {
-  array[i] = Math.random();
+  //array[i] = Math.random();
+  array[i] = 0;
 }
 
 const bufferA = gl.createBuffer();
@@ -44,7 +45,7 @@ gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_COPY);
 
 const bufferB = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, bufferB);
-gl.bufferData(gl.ARRAY_BUFFER, size * 4, gl.DYNAMIC_COPY);
+gl.bufferData(gl.ARRAY_BUFFER, size * 4, gl.DYNAMIC_READ);
 
 const transformFeedback = gl.createTransformFeedback();
 gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, transformFeedback);
@@ -75,28 +76,29 @@ gl.bindBuffer(gl.ARRAY_BUFFER, bufferA);
 gl.getBufferSubData(gl.ARRAY_BUFFER, 0, data);
 console.log(data);
 
+const N = 1000000;
 {
-  const t0 = performance.now();
-  for (let i = 0; i < 10; i++) {
+  const ta0 = performance.now();
+  for (let i = 0; i < N; i++) {
     draw(bufferA, bufferB);
     draw(bufferB, bufferA);
   }
   //gl.bindBuffer(gl.ARRAY_BUFFER, bufferA);
   //gl.getBufferSubData(gl.ARRAY_BUFFER, 0, data);
-  gl.bindBuffer(gl.ARRAY_BUFFER, bufferB);
-  gl.getBufferSubData(gl.ARRAY_BUFFER, 0, data);
-  const t1 = performance.now();
-  console.log(t1 - t0);
-}
-{
+
   const t0 = performance.now();
-  for (let n = 0; n < 10 * 2; n++) {
+  for (let n = 0; n < N * 2; n++) {
     for (let i = 0; i < size; i++) {
       data[i] = data[i] + 1;
     }
   }
   const t1 = performance.now();
   console.log(t1 - t0);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufferB);
+  gl.getBufferSubData(gl.ARRAY_BUFFER, 0, data);
+  const ta1 = performance.now();
+  console.log(ta1 - ta0);
 }
 
 gl.bindBuffer(gl.ARRAY_BUFFER, bufferA);
