@@ -109,12 +109,9 @@ function checkGlError(gl) {
 }
 
 const screenTriangles = new Float32Array([
-  -1.0, 1.0,
-  1.0, -1.0,
-  -1.0, -1.0,
-  -1.0, 1.0,
-  1.0, -1.0,
-  1.0, 1.0,
+  0, 3,
+  2.5, -1.3,
+  -2.5, -1.3,
 ]);
 
 function getColorAttachment(index) {
@@ -131,7 +128,7 @@ var mainFragSource = "#version 300 es\nprecision lowp float;\n\nuniform sampler2
 
 var mainVertSource = "#version 300 es\nprecision lowp float;\n\nin vec2 aPosition;\nout vec2 textureCoords;\n\nvoid main() {\n  //gl_Position = vec4(aPosition, -0.5, 1.0);\n  gl_Position = vec4(aPosition, 0.0, 1.0);\n  textureCoords = ((aPosition / 2.0) + vec2(0.5));\n}\n";
 
-var lifeFragSource = "#version 300 es\nprecision lowp float;\n\nuniform sampler2D uTexture;\nin vec2 textureCoords;\nout vec4 color;\n\nuniform vec2 uScreenSize;\n\nfloat cellState(vec2 coords) {\n  return texture(uTexture, mod(coords, vec2(1.0))).r == 1.0 ? 1.0 : 0.0;\n}\n\nfloat neighborState(vec2 relativeCoords) {\n  return cellState((textureCoords * uScreenSize + relativeCoords) / uScreenSize);\n}\n\nvec4 colorForState(float state) {\n  return vec4(vec3(state), 1.0);\n}\n\nfloat neighborCount() {\n  float count = 0.0;\n  for (float y = -1.0; y <= 1.0; y += 1.0) {\n    for (float x = -1.0; x <= 1.0; x += 1.0) {\n      if (!(x == 0.0 && y == 0.0)) {\n        count += neighborState(vec2(x, y));\n      }\n    }\n  }\n  return count;\n}\n\nvoid main() {\n  float count = neighborCount();\n  if (neighborState(vec2(0.0)) == 0.0) {\n    color = count == 3.0 ? colorForState(1.0) : colorForState(0.0);\n  }\n  else {\n    color = (count == 2.0 || count == 3.0) ? colorForState(1.0) : colorForState(0.0);\n  }\n}\n";
+var lifeFragSource = "#version 300 es\nprecision lowp float;\n\nuniform sampler2D uTexture;\nin vec2 textureCoords;\nout vec4 color;\n\nuniform vec2 uScreenSize;\n\nfloat cellState(vec2 coords) {\n  return texture(uTexture, mod(coords, vec2(1.0))).r == 1.0 ? 1.0 : 0.0;\n}\n\nfloat neighborState(vec2 relativeCoords) {\n  return cellState((textureCoords * uScreenSize + relativeCoords) / uScreenSize);\n}\n\nvec4 colorForState(float state) {\n  return vec4(vec3(state), 1.0);\n}\n\nfloat neighborCount() {\n  float count = 0.0;\n  for (float y = -1.0; y <= 1.0; y += 1.0) {\n    for (float x = -1.0; x <= 1.0; x += 1.0) {\n      //if (!(x == 0.0 && y == 0.0)) {\n        count += neighborState(vec2(x, y));\n      //}\n    }\n  }\n  return count;\n}\n\nvoid main() {\n  float count = neighborCount();\n  if (neighborState(vec2(0.0)) == 0.0) {\n    color = count == 3.0 ? colorForState(1.0) : colorForState(0.0);\n  }\n  else {\n    color = (count == 2.0 || count == 3.0) ? colorForState(1.0) : colorForState(0.0);\n  }\n}\n";
 
 const canvasElement = document.getElementsByTagName('canvas')[0];
 browser(canvasElement, 'could not find canvas element');
@@ -270,7 +267,7 @@ function renderGeneration() {
 
     gl.useProgram(lifeProgram);
     gl.bindBuffer(gl.ARRAY_BUFFER, triangles);
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
 
   {
@@ -281,7 +278,7 @@ function renderGeneration() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
     gl.useProgram(program);
     gl.bindBuffer(gl.ARRAY_BUFFER, triangles);
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
   sourceTextureIndex = 1 - sourceTextureIndex;
   targetTextureIndex = 1 - targetTextureIndex;
