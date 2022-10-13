@@ -153,7 +153,7 @@ function renderGeneration() {
 
     gl.useProgram(lifeProgram);
     gl.bindBuffer(gl.ARRAY_BUFFER, triangles);
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
 
   {
@@ -164,7 +164,7 @@ function renderGeneration() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
     gl.useProgram(program);
     gl.bindBuffer(gl.ARRAY_BUFFER, triangles);
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
   sourceTextureIndex = 1 - sourceTextureIndex;
   targetTextureIndex = 1 - targetTextureIndex;
